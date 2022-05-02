@@ -124,7 +124,7 @@ int main() {
     for(int i=0;i<n;i++)
     calculateAFT(rankOrder[i].second);
     
-    cout << "Task\tProc\tAST\t\tAFT\n";
+    cout << "Task\tProc\t\tAFT\n";
     int makespan = 0;
     for(int i = 0; i < n; i++) {
         cout << i << " \t\t " << assignedProcessor[i] << " \t\t " << actualFinishTime[i]  << "\n";
