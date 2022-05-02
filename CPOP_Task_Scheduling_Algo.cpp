@@ -5,7 +5,7 @@ int dag[100][100],cost[100][100];
 double ranksUp[100],ranksDown[100];
 vector<pair<double,int>> rankOrder;
 int n, m;
-vector<set<pair<int,int>>> procSchedule;
+
 int avalProcessor[100][100];
 int AST[100], assignedProcessor[100],actualFinishTime[100];
 
@@ -38,6 +38,7 @@ void calculateRankDown(int task){
 
 
 void calculateAFT(int task) {
+    //cout<<task<<endl;
     int EST=0;
     int AFT=1e9;
     
@@ -70,7 +71,7 @@ void calculateAFT(int task) {
     
     
     //we do scheduling here
-    if(assignedProcessor[task]!=-1){
+    if(assignedProcessor[task]==-1){
         assignedProcessor[task]=processor;
         avalProcessor[task][processor]=AFT;
     }else{
@@ -90,17 +91,24 @@ int main() {
     }
     
     for(int i = 0; i < n; i++) {
-        for(int j = 0; j < m; j++) cin>>cost[i][j]; //cost[i][j] = time taken for task i to finish on processor j
+        for(int j = 0; j < m; j++) {cin>>cost[i][j];avalProcessor[i][j]=-1;assignedProcessor[j]=-1;} //cost[i][j] = time taken for task i to finish on processor j
     }
     
-    memset(ranksDown,-1,sizeof ranksDown);
-    memset(ranksUp,-1,sizeof ranksUp);
+    for(int i=0;i<n;i++){
+        ranksUp[i]=ranksDown[i]=-1;
+        
+    }
+    for(int i=0;i<n;i++){
+        calculateRankDown(i);
+        calculateRankUp(i);
+    }
+    
     for(int task=0;task<n;task++){
+        cout<<(ranksUp[task]+ranksDown[task])<<endl;
         rankOrder.push_back(make_pair(ranksUp[task]+ranksDown[task],task));
     }
     sort(rankOrder.rbegin(),rankOrder.rend());
-    memset(avalProcessor,0,sizeof avalProcessor);
-    memset(assignedProcessor,-1,sizeof assignedProcessor);
+    
     
     int processor=-1;
     int minSum=1e9;
@@ -116,18 +124,20 @@ int main() {
     
     int j=1;
     assignedProcessor[rankOrder[0].second]=processor;
+    actualFinishTime[rankOrder[0].second]=cost[rankOrder[0].second][processor];
     for(;j<n;j++){
         if(rankOrder[j].first!=rankOrder[j-1].first)break;
         assignedProcessor[rankOrder[j].second]=processor;
+        actualFinishTime[rankOrder[j].second]=cost[rankOrder[j].second][processor]+actualFinishTime[rankOrder[j-1].second];
     }
     
     for(int i=0;i<n;i++)
     calculateAFT(rankOrder[i].second);
     
-    cout << "Task\tProc\t\tAFT\n";
+    cout << "Task\tProc \tAFT\n";
     int makespan = 0;
     for(int i = 0; i < n; i++) {
-        cout << i << " \t\t " << assignedProcessor[i] << " \t\t " << actualFinishTime[i]  << "\n";
+        cout << i << " \t\t " << assignedProcessor[i] << " \t " << actualFinishTime[i]  << "\n";
     } 
     
 }
